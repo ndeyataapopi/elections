@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained()->onDelete('cascade');
             $table->foreignId('election_id')->constrained()->onDelete('cascade');
             $table->foreignId('portfolio_id')->constrained()->onDelete('cascade');
-            // $table->string('staff_number')->nullable();
+            $table->string('staff_number')->nullable();
             $table->string('first_name');
             $table->string('last_name');
             $table->string('gender')->nullable();

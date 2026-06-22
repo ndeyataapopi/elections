@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::table('candidates', function (Blueprint $table) {
             // Add new fields for candidate upload
-            $table->string('staff_number')->nullable()->after('id');
-            $table->string('first_name')->nullable()->after('staff_number');
-            $table->string('last_name')->nullable()->after('first_name');
-            $table->string('gender')->nullable()->after('last_name');
-            $table->string('phone')->nullable()->after('email');
-            $table->boolean('profile_complete')->default(false)->after('approved');
+            // $table->string('staff_number')->nullable()->after('id');
+            // $table->string('first_name')->nullable()->after('staff_number');
+            // $table->string('last_name')->nullable()->after('first_name');
+            // $table->string('gender')->nullable()->after('last_name');
+            // $table->string('phone')->nullable()->after('email');
+            // $table->boolean('profile_complete')->default(false);
             
         });
     }
