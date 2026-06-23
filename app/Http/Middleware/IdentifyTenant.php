@@ -22,7 +22,7 @@ class IdentifyTenant
         $parts = explode('.', $host);
 
         // If no subdomain (elections.test), skip tenant logic
-        if (count($parts) < 3) {
+        if (count($parts) < 4) {
             return $next($request);
         }
 
