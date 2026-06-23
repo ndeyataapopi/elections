@@ -461,7 +461,7 @@ class CandidateController extends Controller
      */
     private function getNotificationSettings(string $type): array
     {
-        $tenant = app('currentTenant');
+        $tenant = tenant();
         return [
             'email_enabled' => $tenant->{"enable_{$type}_email_notifications"} ?? false,
             'sms_enabled' => $tenant->{"enable_{$type}_sms_notifications"} ?? false,

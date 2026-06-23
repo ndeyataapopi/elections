@@ -3,7 +3,6 @@
 use App\Http\Controllers\PlatformDashboardController;
 use App\Http\Controllers\TenantDashboardController;
 use App\Http\Controllers\ElectionController;
-use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\VoterController;
@@ -20,16 +19,18 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
+// Root domain resolved dynamically from APP_URL — no hardcoded domain needed.
+// Changing APP_URL in .env is all that is required to move to any domain.
+$rootDomain = parse_url(config('app.url'), PHP_URL_HOST);
+
 //Landing Page
 Route::get('/', function () 
 {
-    // return view('welcome');
     return redirect('/login');
 });
 
-// Platform Owner Routes
-// Route::prefix('admin')->middleware(['auth'])->domain('elections.test')->group(function ()
-Route::middleware(['auth', 'enforce.tenant'])->domain(parse_url(config('app.url'), PHP_URL_HOST))->group(function ()
+// Platform Owner Routes — constrained to root domain only
+Route::middleware(['auth', 'enforce.tenant'])->domain($rootDomain)->group(function ()
 {
     Route::get('/dashboard', [PlatformDashboardController::class, 'index'])->name('platform.dashboard');
 

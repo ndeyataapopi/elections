@@ -27,7 +27,7 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $user = Auth::user();
-        $currentTenant = app()->bound('currentTenant') ? app('currentTenant') : null;
+        $currentTenant = tenant();
 
         // Check 1: If on main domain (no subdomain) - only super_admin allowed
         if (!$currentTenant) {

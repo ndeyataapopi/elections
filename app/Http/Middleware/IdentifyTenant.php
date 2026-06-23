@@ -5,31 +5,38 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use \App\Models\Tenant;
+use App\Models\Tenant;
 
 class IdentifyTenant
 {
     /**
      * Handle an incoming request.
      *
+     * Detects the tenant subdomain dynamically relative to the configured
+     * APP_URL root domain. Works with any base domain:
+     *   elections.com, elections.com.na, elections.nepticgroup.com, localhost, etc.
+     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
-    {   
-        $host = $request->getHost();
+    {
+        $host       = $request->getHost();
+        $rootDomain = parse_url(config('app.url'), PHP_URL_HOST) ?? '';
 
-        // Split host
-        $parts = explode('.', $host);
-
-        // If no subdomain (elections.test), skip tenant logic
-        if (count($parts) < 4) {
+        // On root domain or www.rootdomain — no tenant context
+        if ($host === $rootDomain || $host === 'www.' . $rootDomain) {
             return $next($request);
         }
 
-        $subdomain = $parts[0];
+        // Only process subdomains of our own root domain
+        if (!str_ends_with($host, '.' . $rootDomain)) {
+            return $next($request);
+        }
 
-        // Optional: skip www
-        if ($subdomain === 'www') {
+        // Extract everything to the left of .rootDomain
+        $subdomain = substr($host, 0, -(strlen($rootDomain) + 1));
+
+        if ($subdomain === '' || $subdomain === 'www') {
             return $next($request);
         }
 

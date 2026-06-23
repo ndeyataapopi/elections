@@ -19,7 +19,7 @@ class ReportController extends Controller
      */
     public function index()
     {
-        $tenant = app('currentTenant');
+        $tenant = tenant();
         $elections = Election::where('tenant_id', $tenant->id)
             ->withCount(['voters', 'candidates', 'portfolios'])
             ->with(['approvalAdmins.user'])
