@@ -29,7 +29,7 @@ Route::get('/', function ()
 
 // Platform Owner Routes
 // Route::prefix('admin')->middleware(['auth'])->domain('elections.test')->group(function ()
-Route::middleware(['auth', 'enforce.tenant'])->domain('elections.test')->group(function ()
+Route::middleware(['auth', 'enforce.tenant'])->domain('elections.nepticgroup.com')->group(function ()
 {
     Route::get('/dashboard', [PlatformDashboardController::class, 'index'])->name('platform.dashboard');
 
