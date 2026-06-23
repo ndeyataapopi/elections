@@ -81,7 +81,7 @@ use Illuminate\Support\Facades\Storage;
                                 @foreach($tenants as $tenant)
                                 <tr>
                                     <td>{{ $tenant->name }}</td>
-                                    <td><a href="http://{{ $tenant->subdomain }}.elections.test" target="_blank" rel="noopener noreferrer">{{ $tenant->subdomain }}.elections.test</a></td>
+                                    <td><a href="{{ parse_url(config('app.url'), PHP_URL_SCHEME) }}://{{ $tenant->subdomain }}.{{ parse_url(config('app.url'), PHP_URL_HOST) }}" target="_blank" rel="noopener noreferrer">{{ $tenant->subdomain }}.{{ parse_url(config('app.url'), PHP_URL_HOST) }}</a></td>
                                     <td>
                                         @if($tenant->logo)
                                             <img src="{{ Storage::url($tenant->logo) }}" alt="{{ $tenant->name }} logo" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
