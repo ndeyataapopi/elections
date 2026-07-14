@@ -15,15 +15,6 @@ class Vote extends Model
         'tenant_id',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (app()->has('currentTenant')) {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-    }
-
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

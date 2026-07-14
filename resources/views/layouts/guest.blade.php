@@ -19,12 +19,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/" class="flex flex-col items-center text-center">
-                    @if(app()->bound('currentTenant') && app('currentTenant') && app('currentTenant')->logo)
-                        <img src="{{ Storage::url(app('currentTenant')->logo) }}" alt="{{ app('currentTenant')->name }}" class="h-20 w-auto">
-                        <span class="mt-2 font-semibold text-gray-700">{{app('currentTenant')->name}}</span>
-                    @else
-                        <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                    @endif
+                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
                 </a>
             </div>
 

@@ -35,15 +35,6 @@ class Election extends Model
         'results_approved_at' => 'datetime',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (app()->has('currentTenant')) {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-    }
-
     /**
      * Update election status based on current state and time
      */

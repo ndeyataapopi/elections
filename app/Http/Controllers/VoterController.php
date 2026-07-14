@@ -53,7 +53,13 @@ class VoterController extends Controller
     public function edit($id)
     {
         //
-        $voter = Voter::with(['election'])->findOrFail($id);
+        $user = Auth::user();
+        $voter = Voter::where('id', $id)
+            ->whereHas('election', function ($query) use ($user) {
+                $query->where('tenant_id', $user->tenant_id);
+            })
+            ->with(['election'])
+            ->firstOrFail();
         return view('tenant.voters.edit', compact('voter'));
     }
 
@@ -73,7 +79,12 @@ class VoterController extends Controller
         ]);
 
         try {
-            $voter = Voter::findOrFail($id);
+            $user = Auth::user();
+            $voter = Voter::where('id', $id)
+                ->whereHas('election', function ($query) use ($user) {
+                    $query->where('tenant_id', $user->tenant_id);
+                })
+                ->firstOrFail();
             
             $voter->update([
                 'staff_number' => $request->staff_number,
@@ -100,7 +111,11 @@ class VoterController extends Controller
     public function view($id)
     {
         //
-        $election = Election::with(['voters'])->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['voters'])
+            ->firstOrFail();
         return view('tenant.voters.view', compact('election'));
     }
 
@@ -110,7 +125,10 @@ class VoterController extends Controller
     public function upload($id)
     {
         //
-        $election = Election::findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->firstOrFail();
         return view('tenant.voters.upload', compact('election'));
     }
 
@@ -151,7 +169,10 @@ class VoterController extends Controller
                 ->with('error', 'No uploaded voters found. Please upload a file first.');
         }
 
-        $election = Election::findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->firstOrFail();
         $voters = session('uploaded_voters');
         
         return view('tenant.voters.review', compact('election', 'voters'));
@@ -165,7 +186,10 @@ class VoterController extends Controller
         //
         try {
             $voters = session('uploaded_voters');
-            $election = Election::findOrFail($id);
+            $user = Auth::user();
+            $election = Election::where('id', $id)
+                ->where('tenant_id', $user->tenant_id)
+                ->firstOrFail();
             
             foreach ($voters as $voterData) {
                 $voter = array_merge($voterData, [
@@ -195,7 +219,13 @@ class VoterController extends Controller
     public function details($id)
     {
         //
-        $voter = Voter::with(['election'])->findOrFail($id);
+        $user = Auth::user();
+        $voter = Voter::where('id', $id)
+            ->whereHas('election', function ($query) use ($user) {
+                $query->where('tenant_id', $user->tenant_id);
+            })
+            ->with(['election'])
+            ->firstOrFail();
         return view('tenant.voters.details', compact('voter'));
     }
 
@@ -205,7 +235,12 @@ class VoterController extends Controller
     public function destroy($id)
     {
         try {
-            $voter = Voter::findOrFail($id);
+            $user = Auth::user();
+            $voter = Voter::where('id', $id)
+                ->whereHas('election', function ($query) use ($user) {
+                    $query->where('tenant_id', $user->tenant_id);
+                })
+                ->firstOrFail();
             $electionId = $voter->election_id;
             $voter->delete();
             
@@ -285,7 +320,11 @@ class VoterController extends Controller
     {
         try {
             // 1. Load election with voters
-            $election = Election::with('voters')->findOrFail($electionId);
+            $user = Auth::user();
+            $election = Election::where('id', $electionId)
+                ->where('tenant_id', $user->tenant_id)
+                ->with('voters')
+                ->firstOrFail();
             $voters = $election->voters;
 
             if ($voters->isEmpty()) {
@@ -346,7 +385,13 @@ class VoterController extends Controller
     {
         try {
             // 1. Load voter with election
-            $voter = Voter::with('election')->findOrFail($voterId);
+            $user = Auth::user();
+            $voter = Voter::where('id', $voterId)
+                ->whereHas('election', function ($query) use ($user) {
+                    $query->where('tenant_id', $user->tenant_id);
+                })
+                ->with('election')
+                ->firstOrFail();
             $election = $voter->election;
 
             // 2. Check notification settings
@@ -394,7 +439,7 @@ class VoterController extends Controller
      */
     private function getNotificationSettings(string $type): array
     {
-        $tenant = tenant();
+        $tenant = auth()->user()->tenant;
         return [
             'email_enabled' => $tenant->{"enable_{$type}_email_notifications"} ?? false,
             'sms_enabled' => $tenant->{"enable_{$type}_sms_notifications"} ?? false,

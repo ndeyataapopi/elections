@@ -16,7 +16,11 @@ class ElectionExportController extends Controller
      */
     public function exportPdf($id)
     {
-        $election = Election::with(['portfolios.candidates.votes', 'voters', 'approvalAdmins.user'])->findOrFail($id);
+        $user = auth()->user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['portfolios.candidates.votes', 'voters', 'approvalAdmins.user'])
+            ->firstOrFail();
         
         // Calculate results
         $results = $this->calculateResults($election);
@@ -37,7 +41,11 @@ class ElectionExportController extends Controller
      */
     public function exportCsv($id)
     {
-        $election = Election::with(['portfolios.candidates.votes', 'voters'])->findOrFail($id);
+        $user = auth()->user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['portfolios.candidates.votes', 'voters'])
+            ->firstOrFail();
         
         // Calculate results
         $results = $this->calculateResults($election);

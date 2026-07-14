@@ -19,18 +19,14 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
 
-// Root domain resolved dynamically from APP_URL — no hardcoded domain needed.
-// Changing APP_URL in .env is all that is required to move to any domain.
-$rootDomain = parse_url(config('app.url'), PHP_URL_HOST);
-
 //Landing Page
 Route::get('/', function () 
 {
     return redirect('/login');
 });
 
-// Platform Owner Routes — constrained to root domain only
-Route::middleware(['auth', 'enforce.tenant'])->domain($rootDomain)->group(function ()
+// Platform Owner Routes
+Route::middleware(['auth', 'enforce.tenant'])->group(function ()
 {
     Route::get('/dashboard', [PlatformDashboardController::class, 'index'])->name('platform.dashboard');
 
@@ -76,7 +72,7 @@ Route::middleware(['auth', 'enforce.tenant'])->domain($rootDomain)->group(functi
 });
 
 // Tenant Routes
-Route::middleware(['tenant','auth','enforce.tenant'])->group(function ()
+Route::middleware(['auth', 'enforce.tenant'])->group(function ()
 {
     Route::get('/dashboard', [TenantDashboardController::class, 'index'])->name('tenant.dashboard');
 

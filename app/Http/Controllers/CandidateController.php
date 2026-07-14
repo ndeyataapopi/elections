@@ -59,7 +59,13 @@ class CandidateController extends Controller
     public function edit($id)
     {
         //
-        $candidate = Candidate::with(['election', 'portfolio'])->findOrFail($id);
+        $user = Auth::user();
+        $candidate = Candidate::where('id', $id)
+            ->whereHas('election', function ($query) use ($user) {
+                $query->where('tenant_id', $user->tenant_id);
+            })
+            ->with(['election', 'portfolio'])
+            ->firstOrFail();
         return view('tenant.candidates.edit', compact('candidate'));
     }
 
@@ -83,7 +89,12 @@ class CandidateController extends Controller
         ]);
 
         try {
-            $candidate = Candidate::findOrFail($id);
+            $user = Auth::user();
+            $candidate = Candidate::where('id', $id)
+                ->whereHas('election', function ($query) use ($user) {
+                    $query->where('tenant_id', $user->tenant_id);
+                })
+                ->firstOrFail();
             
             $updateData = [
                 'staff_number' => $request->staff_number,
@@ -129,7 +140,11 @@ class CandidateController extends Controller
     public function view($id)
     {
         //
-        $election = Election::with(['candidates.portfolio'])->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['candidates.portfolio'])
+            ->firstOrFail();
         return view('tenant.candidates.view', compact('election'));
     }
 
@@ -139,7 +154,13 @@ class CandidateController extends Controller
     public function details($id)
     {
         //
-        $candidate = Candidate::with(['election', 'portfolio'])->findOrFail($id);
+        $user = Auth::user();
+        $candidate = Candidate::where('id', $id)
+            ->whereHas('election', function ($query) use ($user) {
+                $query->where('tenant_id', $user->tenant_id);
+            })
+            ->with(['election', 'portfolio'])
+            ->firstOrFail();
         return view('tenant.candidates.details', compact('candidate'));
     }
 
@@ -149,7 +170,11 @@ class CandidateController extends Controller
     public function upload($id)
     {
         //
-        $election = Election::with('portfolios')->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with('portfolios')
+            ->firstOrFail();
         return view('tenant.candidates.upload', compact('election'));
     }
 
@@ -190,7 +215,11 @@ class CandidateController extends Controller
                 ->with('error', 'No uploaded candidates found. Please upload a file first.');
         }
 
-        $election = Election::with('portfolios')->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with('portfolios')
+            ->firstOrFail();
         $candidates = session('uploaded_candidates');
         
         return view('tenant.candidates.assign-portfolios', compact('election', 'candidates'));
@@ -209,7 +238,10 @@ class CandidateController extends Controller
 
         try {
             $candidates = session('uploaded_candidates');
-            $election = Election::findOrFail($id);
+            $user = Auth::user();
+            $election = Election::where('id', $id)
+                ->where('tenant_id', $user->tenant_id)
+                ->firstOrFail();
             
             foreach ($request->candidates as $index => $candidateData) {
                 if (isset($candidates[$index])) {
@@ -300,7 +332,12 @@ class CandidateController extends Controller
     public function destroy($id)
     {
         try {
-            $candidate = Candidate::findOrFail($id);
+            $user = Auth::user();
+            $candidate = Candidate::where('id', $id)
+                ->whereHas('election', function ($query) use ($user) {
+                    $query->where('tenant_id', $user->tenant_id);
+                })
+                ->firstOrFail();
             $electionId = $candidate->election_id;
             $candidate->delete();
             
@@ -322,7 +359,11 @@ class CandidateController extends Controller
     {
         try {
             // 1. Load election with candidates
-            $election = Election::with('candidates')->findOrFail($electionId);
+            $user = Auth::user();
+            $election = Election::where('id', $electionId)
+                ->where('tenant_id', $user->tenant_id)
+                ->with('candidates')
+                ->firstOrFail();
             $candidates = $election->candidates;
 
             if ($candidates->isEmpty()) {
@@ -401,7 +442,13 @@ class CandidateController extends Controller
     {
         try {
             // 1. Load candidate with election
-            $candidate = Candidate::with('election')->findOrFail($candidateId);
+            $user = Auth::user();
+            $candidate = Candidate::where('id', $candidateId)
+                ->whereHas('election', function ($query) use ($user) {
+                    $query->where('tenant_id', $user->tenant_id);
+                })
+                ->with('election')
+                ->firstOrFail();
             $election = $candidate->election;
 
             Log::info('Starting single candidate notification', [
@@ -461,7 +508,7 @@ class CandidateController extends Controller
      */
     private function getNotificationSettings(string $type): array
     {
-        $tenant = tenant();
+        $tenant = auth()->user()->tenant;
         return [
             'email_enabled' => $tenant->{"enable_{$type}_email_notifications"} ?? false,
             'sms_enabled' => $tenant->{"enable_{$type}_sms_notifications"} ?? false,

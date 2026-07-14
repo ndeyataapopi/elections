@@ -14,12 +14,4 @@ class AuditLog extends Model
         'meta',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (app()->has('currentTenant')) {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-    }
 }

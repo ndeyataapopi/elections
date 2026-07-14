@@ -19,7 +19,7 @@ class ReportController extends Controller
      */
     public function index()
     {
-        $tenant = tenant();
+        $tenant = auth()->user()->tenant;
         $elections = Election::where('tenant_id', $tenant->id)
             ->withCount(['voters', 'candidates', 'portfolios'])
             ->with(['approvalAdmins.user'])
@@ -34,8 +34,11 @@ class ReportController extends Controller
      */
     public function view($id)
     {
-        $election = Election::with(['portfolios.candidates.votes', 'approvalAdmins.user'])
-            ->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['portfolios.candidates.votes', 'approvalAdmins.user'])
+            ->firstOrFail();
 
         $results = $this->calculateResults($election);
 
@@ -48,7 +51,11 @@ class ReportController extends Controller
     public function releaseResults($id)
     {
         try {
-            $election = Election::with('approvalAdmins.user')->findOrFail($id);
+            $user = Auth::user();
+            $election = Election::where('id', $id)
+                ->where('tenant_id', $user->tenant_id)
+                ->with('approvalAdmins.user')
+                ->firstOrFail();
 
             // Check if results can be released
             if (!$election->canReleaseResults()) {
@@ -156,8 +163,11 @@ class ReportController extends Controller
      */
     public function approveView($id)
     {
-        $election = Election::with(['portfolios.candidates.votes', 'approvalAdmins.user', 'resultsReleasedBy'])
-            ->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['portfolios.candidates.votes', 'approvalAdmins.user', 'resultsReleasedBy'])
+            ->firstOrFail();
 
         // Check if user is an approval admin
         $isAdmin = $election->approvalAdmins->contains('user_id', Auth::id());
@@ -182,7 +192,11 @@ class ReportController extends Controller
         ]);
 
         try {
-            $election = Election::with('approvalAdmins')->findOrFail($id);
+            $user = Auth::user();
+            $election = Election::where('id', $id)
+                ->where('tenant_id', $user->tenant_id)
+                ->with('approvalAdmins')
+                ->firstOrFail();
 
             // Check if user is an approval admin
             $isAdmin = $election->approvalAdmins->contains('user_id', Auth::id());

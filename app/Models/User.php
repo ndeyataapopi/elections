@@ -48,17 +48,6 @@ class User extends Authenticatable
         ];
     }
 
-    protected static function booted()
-    {
-        static::creating(function ($model) 
-        {
-            if (app()->has('currentTenant')) 
-            {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-    }
-
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);

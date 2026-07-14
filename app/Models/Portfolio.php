@@ -19,15 +19,6 @@ class Portfolio extends Model
         'max_votes',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (app()->has('currentTenant')) {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-    }
-
     public function election()
     {
         return $this->belongsTo(Election::class);

@@ -100,7 +100,11 @@ class ElectionController extends Controller
 
     public function results($id)
     {
-        $election = Election::with(['categories.candidates'])->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with(['categories.candidates'])
+            ->firstOrFail();
 
         // $results = Vote::where('election_id', $id)
         //     ->selectRaw('candidate_id, COUNT(*) as total')
@@ -131,7 +135,11 @@ class ElectionController extends Controller
 
     public function exportPdf($id)
     {
-        $election = Election::with('candidates.votes')->findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->with('candidates.votes')
+            ->firstOrFail();
 
         $pdf = Pdf::loadView('admin.pdf.results', compact('election'));
 
@@ -145,8 +153,10 @@ class ElectionController extends Controller
     {
         //Cannot edit and on-going election
         //Elections are either Ready To Start; In Progress; Completed
-        $election = Election::findOrFail($id);
         $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->firstOrFail();
         $clientAdmins = User::where('tenant_id', $user->tenant->id)
                            ->where('role', 'client_admin')
                            ->get();
@@ -175,7 +185,10 @@ class ElectionController extends Controller
             'approval_admins.*' => 'exists:users,id',
         ]);
 
-        $election = Election::findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->firstOrFail();
 
         $election->update([
             'name' => $request->election_name,

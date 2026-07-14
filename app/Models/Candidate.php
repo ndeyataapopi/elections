@@ -26,12 +26,6 @@ class Candidate extends Model
 
     protected static function booted()
     {
-        static::creating(function ($model) {
-            if (app()->has('currentTenant')) {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-
         // Generate short 5-char token for SMS-friendly URLs
         static::creating(function ($candidate) {
             $plainToken = Str::random(5);

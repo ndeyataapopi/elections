@@ -34,15 +34,6 @@ class Tenant extends Model
         'enable_voter_sms_notifications' => 'boolean',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (app()->has('currentTenant')) {
-                $model->tenant_id = app('currentTenant')->id;
-            }
-        });
-    }
-
     public function users()
     {
         return $this->hasMany(User::class);

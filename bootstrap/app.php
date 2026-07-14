@@ -13,7 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //
         $middleware->alias([
-            'tenant' => \App\Http\Middleware\IdentifyTenant::class,
             'enforce.tenant' => \App\Http\Middleware\EnforceTenantAccess::class,
         ]);
     })

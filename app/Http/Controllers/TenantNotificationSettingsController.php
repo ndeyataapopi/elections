@@ -16,7 +16,7 @@ class TenantNotificationSettingsController extends Controller
      */
     public function index()
     {
-        $tenant = tenant();
+        $tenant = auth()->user()->tenant;
         return view('tenant.notifications.settings', compact('tenant'));
     }
 
@@ -25,7 +25,7 @@ class TenantNotificationSettingsController extends Controller
      */
     public function update(Request $request)
     {
-        $tenant = tenant();
+        $tenant = auth()->user()->tenant;
 
         $validated = $request->validate([
             'enable_candidate_email_notifications' => 'boolean',
@@ -59,7 +59,7 @@ class TenantNotificationSettingsController extends Controller
         ]);
 
         try {
-            $tenant = tenant();
+            $tenant = auth()->user()->tenant;
             $testEmail = $request->input('test_email');
 
             // Create email log
@@ -106,7 +106,7 @@ class TenantNotificationSettingsController extends Controller
         ]);
 
         try {
-            $tenant = tenant();
+            $tenant = auth()->user()->tenant;
             $testPhone = $request->input('test_phone');
             $smsService = new SMSService();
 

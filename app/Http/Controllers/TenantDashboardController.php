@@ -15,7 +15,7 @@ class TenantDashboardController extends Controller
      */
     public function index()
     {
-        $tenantId = tenant()?->id;
+        $tenantId = auth()->user()->tenant_id;
         
         // Count users (client admins) for the tenant
         $usersCount = User::where('tenant_id', $tenantId)->where('role', 'client_admin')->count();

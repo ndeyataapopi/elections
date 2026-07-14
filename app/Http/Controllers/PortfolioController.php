@@ -26,7 +26,10 @@ class PortfolioController extends Controller
     public function view($id)
     {
         //
-        $election = Election::findOrFail($id);
+        $user = Auth::user();
+        $election = Election::where('id', $id)
+            ->where('tenant_id', $user->tenant_id)
+            ->firstOrFail();
         return view('tenant.portfolios.view', compact('election'));
     }
 
@@ -36,7 +39,12 @@ class PortfolioController extends Controller
     public function edit($id)
     {
         //
-        $portfolio = Portfolio::findOrFail($id);
+        $user = Auth::user();
+        $portfolio = Portfolio::where('id', $id)
+            ->whereHas('election', function ($query) use ($user) {
+                $query->where('tenant_id', $user->tenant_id);
+            })
+            ->firstOrFail();
         return view('tenant.portfolios.edit', compact('portfolio'));
     }
 
@@ -51,7 +59,12 @@ class PortfolioController extends Controller
             'max_votes' => 'required|integer|min:1',
         ]);
 
-        $portfolio = Portfolio::findOrFail($id);
+        $user = Auth::user();
+        $portfolio = Portfolio::where('id', $id)
+            ->whereHas('election', function ($query) use ($user) {
+                $query->where('tenant_id', $user->tenant_id);
+            })
+            ->firstOrFail();
         $portfolio->update([
             'name' => $request->name,
             'max_votes' => $request->max_votes,
