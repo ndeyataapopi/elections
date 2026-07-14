@@ -28,7 +28,7 @@ Route::get('/', function ()
 // Platform Owner Routes
 Route::middleware(['auth', 'enforce.tenant'])->group(function ()
 {
-    Route::get('/dashboard', [PlatformDashboardController::class, 'index'])->name('platform.dashboard');
+    Route::get('/platform/dashboard', [PlatformDashboardController::class, 'index'])->name('platform.dashboard');
 
     //Platform Admin - Tenant Routes
     Route::get('/tenants', [TenantController::class, 'index'])->name('tenants.index');
